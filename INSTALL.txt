@@ -1,0 +1,18 @@
+1) INSTALL RABBITMQ (DOCKER)
+
+RabbitMQ is the message broker that is used by Nameko
+
+docker pull rabbitmq
+docker run -d -p 5672:5672 rabbitmq
+
+2) INSTALL REDIS (DOCKER)
+
+Redis is the key-value database that we use to register the services, and to store the information exchanged
+by the container
+
+docker pull redis
+docker run -d -p 6379:6379 redis
+
+3) INSTALL THE PYTHON REQUIREMENTS
+
+pip install -U -r requirements.txt
