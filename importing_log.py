@@ -5,11 +5,12 @@ from threading import Thread
 
 import redis
 from nameko.rpc import rpc
+from poc_config import *
 
 import pm4py
 
-database = redis.Redis("localhost", db=0)
-registry = redis.Redis("localhost", db=1)
+database = redis.Redis(OBJECT_DATAFRAME_HOSTNAME, db=OBJECT_DATAFRAME_ID)
+registry = redis.Redis(REGISTRY_DATAFRAME_HOSTNAME, db=REGISTRY_DATAFRAME_ID)
 
 
 class ImportingLog(object):

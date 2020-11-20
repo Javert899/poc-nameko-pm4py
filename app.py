@@ -2,11 +2,12 @@ import redis
 from flask import Flask
 from flask import request
 from flask_nameko import FlaskPooledClusterRpcProxy
+from poc_config import *
 
 rpc = FlaskPooledClusterRpcProxy()
 app = Flask(__name__)
-database = redis.Redis("localhost", db=0)
-registry = redis.Redis("localhost", db=1)
+database = redis.Redis(OBJECT_DATAFRAME_HOSTNAME, db=OBJECT_DATAFRAME_ID)
+registry = redis.Redis(REGISTRY_DATAFRAME_HOSTNAME, db=REGISTRY_DATAFRAME_ID)
 
 
 @app.route('/call_service')
@@ -61,7 +62,7 @@ def get_entrypoints():
 
 if __name__ == "__main__":
     app.config.update(dict(
-        NAMEKO_AMQP_URI='amqp://localhost'
+        NAMEKO_AMQP_URI=AMQP_URL
     ))
     rpc.init_app(app)
     app.run()
