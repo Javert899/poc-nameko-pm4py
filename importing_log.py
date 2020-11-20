@@ -27,7 +27,7 @@ class ImportingLog(object):
 
     @rpc
     def get_log_string(self, log_key):
-        log = database.get(log_key)
+        log = database.get(log_key).decode("utf-8")
         return log
 
 
