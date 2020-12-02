@@ -37,13 +37,13 @@
 					if (!(ent_value["extension"] in availableImporters)) {
 						availableImporters[ent_value["extension"]] = [];
 					}
-					availableImporters[ent_value["extension"]].push(ent_value["object_type"]);
+					availableImporters[ent_value["extension"]].push({"object_type": ent_value["object_type"], "method": ent_name});
 				}
 				else if (ent_value["type"] == "exporter") {
 					if (!(ent_value["object_type"] in availableExporters)) {
 						availableExporters[ent_value["object_type"]] = [];
 					}
-					availableExporters[ent_value["object_type"]].push(ent_value["extension"]);
+					availableExporters[ent_value["object_type"]].push({"extension": ent_value["extension"], "method": ent_name});
 				}
 			}
 		}
@@ -66,9 +66,11 @@
 				console.log(objVal["type"]);
 				console.log(objVal["type"] in availableExporters);
 				if (objVal["type"] in availableExporters) {
-					var doExport = document.createElement("span");
-					doExport.innerHTML = "<b><a href='http://localhost:5000/download?id="+objKey+"&filename=prova"+availableExporters[objVal["type"]][0]+"'>Export the object ("+availableExporters[objVal["type"]][0]+")</a></b>";
-					objDiv.appendChild(doExport);
+					for (var i in availableExporters[objVal["type"]]) {
+						var doExport = document.createElement("span");
+						doExport.innerHTML = "<b><a href='http://localhost:5000/download?id="+objKey+"&filename=prova"+availableExporters[objVal["type"]][i]["extension"]+"&method="+availableExporters[objVal["type"]][i]["method"]+"'>Export the object ("+availableExporters[objVal["type"]][i]["extension"]+")</a></b><br />";
+						objDiv.appendChild(doExport);
+					}
 				}
 				objectsContainer.appendChild(objDiv);
 			}
