@@ -6,7 +6,7 @@ resp = requests.post("http://localhost:5000/upload", files=files)
 ids = resp.json()
 types = {}
 for id in ids:
-    types[id] = "EventLog2"
+    types[id] = "EventLog"
 requests.post("http://localhost:5000/set_objects_type", json=types)
 
 for id in ids:

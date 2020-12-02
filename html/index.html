@@ -3,7 +3,7 @@
 		<script type="text/javascript" src="jquery.min.js"></script>
 	</head>
 	<body>
-		<div id="objects">
+		<div id="objects_container">
 			
 		</div>
 	</body>
@@ -21,6 +21,7 @@
 				jQuery.get("http://localhost:5000/get_entrypoints", function(data_entrypoints) {
 					entrypoints = data_entrypoints;
 					postprocess();
+					populateDiv();
 				});
 			});
 		}
@@ -33,11 +34,43 @@
 					algorithmEntrypoints[ent_name] = ent_value;
 				}
 				else if (ent_value["type"] == "importer") {
-					availableImporters[ent_value["extension"]] = ent_value["object_type"];
+					if (!(ent_value["extension"] in availableImporters)) {
+						availableImporters[ent_value["extension"]] = [];
+					}
+					availableImporters[ent_value["extension"]].push(ent_value["object_type"]);
 				}
 				else if (ent_value["type"] == "exporter") {
-					availableExporters[ent_value["object_type"]] = ent_value["extension"];
+					if (!(ent_value["object_type"] in availableExporters)) {
+						availableExporters[ent_value["object_type"]] = [];
+					}
+					availableExporters[ent_value["object_type"]].push(ent_value["extension"]);
 				}
+			}
+		}
+		
+		function populateDiv() {
+			var objectsContainer = document.getElementById("objects_container");
+			for (var objKey in objects) {
+				var objVal = objects[objKey];
+				var objDiv = document.createElement("div");
+				var objId = document.createElement("span");
+				objId.innerHTML = "<b>Object ID:</b>" + objKey;
+				objDiv.appendChild(objId);
+				var objName = document.createElement("div");
+				objName.innerHTML = "Object name: "+objVal["name"];
+				objDiv.appendChild(objName);
+				var objType = document.createElement("div");
+				objType.innerHTML = "Object type: "+objVal["type"];
+				objDiv.appendChild(objType);
+				console.log(availableExporters);
+				console.log(objVal["type"]);
+				console.log(objVal["type"] in availableExporters);
+				if (objVal["type"] in availableExporters) {
+					var doExport = document.createElement("span");
+					doExport.innerHTML = "<b><a href='http://localhost:5000/download?id="+objKey+"&filename=prova"+availableExporters[objVal["type"]][0]+"'>Export the object ("+availableExporters[objVal["type"]][0]+")</a></b>";
+					objDiv.appendChild(doExport);
+				}
+				objectsContainer.appendChild(objDiv);
 			}
 		}
 		
