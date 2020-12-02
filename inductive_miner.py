@@ -4,11 +4,11 @@ import time
 import uuid
 from threading import Thread
 
+import pm4py
 import redis
 from nameko.rpc import rpc
-from poc_config import *
 
-import pm4py
+from poc_config import *
 
 database = redis.Redis(OBJECT_DATAFRAME_HOSTNAME, db=OBJECT_DATAFRAME_ID)
 registry = redis.Redis(REGISTRY_DATAFRAME_HOSTNAME, db=REGISTRY_DATAFRAME_ID)
@@ -30,7 +30,7 @@ class InductiveMiner(object):
         net_string = pm4py.objects.petri.exporter.variants.pnml.export_petri_as_string(net, im, fm)
         model_key = str(uuid.uuid4())
         database.set(model_key, net_string)
-        database.set(model_key+"_type", "AcceptingPetriNet")
+        database.set(model_key + "_type", "AcceptingPetriNet")
         return model_key
 
 
@@ -42,7 +42,8 @@ class ServiceRegister(Thread):
     def run(self):
         while True:
             self.registry.set("inductive_miner.apply_inductive", json.dumps(
-                {"inputs": {"log_key": "EventLog"}, "outputs": {"model_key": "AcceptingPetriNet"}}))
+                {"inputs": {"log_key": "EventLog"}, "outputs": {"model_key": "AcceptingPetriNet"},
+                 "type": "algorithm"}))
             self.registry.expire("inductive_miner.apply_inductive", 20)
             time.sleep(10)
 
