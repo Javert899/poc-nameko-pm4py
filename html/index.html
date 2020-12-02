@@ -3,20 +3,52 @@
 		<script type="text/javascript" src="jquery.min.js"></script>
 	</head>
 	<body>
-		
+		<div id="objects">
+			
+		</div>
 	</body>
 	<script type="text/javascript">
-		var objects = [];
-		var entrypoints = [];
-		var algorithmEntrypoints = [];
-		var availableImporters = [];
-		var availableExporters = [];
+		var objects = {};
+		var entrypoints = {};
+		var algorithmEntrypoints = {};
+		var availableImporters = {};
+		var availableExporters = {};
 		getObjects();
 		
 		function getObjects() {
-			jQuery.get("http://localhost:5000/get_objects", function(data) {
-				objects = data;
-				console.log(objects);
+			jQuery.get("http://localhost:5000/get_objects", function(data_objects) {
+				objects = data_objects;
+				jQuery.get("http://localhost:5000/get_entrypoints", function(data_entrypoints) {
+					entrypoints = data_entrypoints;
+					postprocess();
+				});
+			});
+		}
+		
+		function postprocess() {
+			for (var ent_name in entrypoints) {
+				ent_value = JSON.parse(entrypoints[ent_name]);
+				entrypoints[ent_name] = ent_value;
+				if (ent_value["type"] == "algorithm") {
+					algorithmEntrypoints[ent_name] = ent_value;
+				}
+				else if (ent_value["type"] == "importer") {
+					availableImporters[ent_value["extension"]] = ent_value["object_type"];
+				}
+				else if (ent_value["type"] == "exporter") {
+					availableExporters[ent_value["object_type"]] = ent_value["extension"];
+				}
+			}
+		}
+		
+		function rpcCall(service, arguments) {
+			var baseUrl = "http://localhost:5000/call_service?service="+service;
+			for (var arg_key in arguments) {
+				arg_value = arguments[arg_key];
+				baseUrl += "&" + arg_key + "=" + arg_value;
+			}
+			jQuery.get(baseUrl, function(data) {
+				window.reload();
 			});
 		}
 	</script>
