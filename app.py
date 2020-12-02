@@ -59,14 +59,6 @@ def upload():
     return jsonify(ret)
 
 
-@app.route("/set_objects_type", methods=['POST'])
-def set_objects_type():
-    content = request.json
-    for object_id in content:
-        database.set(object_id + "_type", content[object_id])
-    return ""
-
-
 @app.route('/download', methods=['GET'])
 def download():
     id = request.args.get("id", type=str)
@@ -81,6 +73,14 @@ def download():
     temp_file = open(file_name, "rb")
     resp = send_file(temp_file, attachment_filename=filename)
     return resp
+
+
+@app.route("/set_objects_type", methods=['POST'])
+def set_objects_type():
+    content = request.json
+    for object_id in content:
+        database.set(object_id + "_type", content[object_id])
+    return ""
 
 
 def __get_object_types():
