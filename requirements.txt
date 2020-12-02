@@ -3,3 +3,6 @@ redis
 nameko
 Flask
 flask_nameko
+flask-cors
+setuptools
+Flask-BasicAuth

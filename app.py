@@ -5,10 +5,12 @@ from flask import Flask
 from flask import request, jsonify, send_file
 from flask_nameko import FlaskPooledClusterRpcProxy
 from tempfile import NamedTemporaryFile
+from flask_cors import CORS
 from poc_config import *
 
 rpc = FlaskPooledClusterRpcProxy()
 app = Flask(__name__)
+CORS(app)
 database = redis.Redis(OBJECT_DATAFRAME_HOSTNAME, db=OBJECT_DATAFRAME_ID)
 registry = redis.Redis(REGISTRY_DATAFRAME_HOSTNAME, db=REGISTRY_DATAFRAME_ID)
 

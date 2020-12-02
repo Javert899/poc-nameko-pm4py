@@ -1,0 +1,21 @@
+<html>
+	<head>
+		<script type="text/javascript" src="jquery.min.js"></script>
+	</head>
+	<body>
+		
+	</body>
+	<script type="text/javascript">
+		var objects = [];
+		var entrypoints = [];
+		var algorithmEntrypoints = [];
+		var availableImporters = [];
+		var availableExporters = [];
+		getObjects();
+		console.log(objects);
+		
+		function getObjects() {
+			jQuery.get("http://localhost:5000/get_objects", function(data) { objects = data; });
+		}
+	</script>
+</html>
