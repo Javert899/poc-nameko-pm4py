@@ -1,7 +1,11 @@
 import redis
+import uuid
+import pathlib
 from flask import Flask
-from flask import request
+from flask import request, jsonify
+from type_mapping import type_mapping
 from flask_nameko import FlaskPooledClusterRpcProxy
+from tempfile import NamedTemporaryFile
 from poc_config import *
 
 rpc = FlaskPooledClusterRpcProxy()
@@ -60,9 +64,24 @@ def get_entrypoints():
     return "".join(stru)
 
 
+@app.route("/upload", methods=['POST'])
+def upload():
+    ret = []
+    for filek in request.files:
+        file = request.files[filek]
+        extension = pathlib.Path(file.filename).suffix
+        if extension in type_mapping:
+            object_type = type_mapping[extension]
+            object_id = str(uuid.uuid4())
+            content = file.stream.read()
+            database.set(object_id, content)
+            database.set(object_id+"_type", object_type)
+    return jsonify(ret)
+
+
 if __name__ == "__main__":
     app.config.update(dict(
         NAMEKO_AMQP_URI=AMQP_URL
     ))
     rpc.init_app(app)
-    app.run()
+    app.run(host="0.0.0.0")
