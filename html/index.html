@@ -12,10 +12,12 @@
 		var availableImporters = [];
 		var availableExporters = [];
 		getObjects();
-		console.log(objects);
 		
 		function getObjects() {
-			jQuery.get("http://localhost:5000/get_objects", function(data) { objects = data; });
+			jQuery.get("http://localhost:5000/get_objects", function(data) {
+				objects = data;
+				console.log(objects);
+			});
 		}
 	</script>
 </html>
