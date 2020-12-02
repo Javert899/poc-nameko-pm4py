@@ -37,13 +37,13 @@
 					if (!(ent_value["extension"] in availableImporters)) {
 						availableImporters[ent_value["extension"]] = [];
 					}
-					availableImporters[ent_value["extension"]].push({"object_type": ent_value["object_type"], "method": ent_name});
+					availableImporters[ent_value["extension"]].push({"object_type": ent_value["object_type"], "method": ent_name, "name": ent_value["name"]});
 				}
 				else if (ent_value["type"] == "exporter") {
 					if (!(ent_value["object_type"] in availableExporters)) {
 						availableExporters[ent_value["object_type"]] = [];
 					}
-					availableExporters[ent_value["object_type"]].push({"extension": ent_value["extension"], "method": ent_name});
+					availableExporters[ent_value["object_type"]].push({"extension": ent_value["extension"], "method": ent_name, "name": ent_value["name"]});
 				}
 			}
 		}
@@ -68,8 +68,23 @@
 				if (objVal["type"] in availableExporters) {
 					for (var i in availableExporters[objVal["type"]]) {
 						var doExport = document.createElement("span");
-						doExport.innerHTML = "<b><a href='http://localhost:5000/download?id="+objKey+"&filename=prova"+availableExporters[objVal["type"]][i]["extension"]+"&method="+availableExporters[objVal["type"]][i]["method"]+"'>Export the object ("+availableExporters[objVal["type"]][i]["extension"]+")</a></b><br />";
+						doExport.innerHTML = "<b><a href='http://localhost:5000/download?id="+objKey+"&filename=prova"+availableExporters[objVal["type"]][i]["extension"]+"&method="+availableExporters[objVal["type"]][i]["method"]+"'>"+availableExporters[objVal["type"]][i]["name"]+"</a></b><br />";
 						objDiv.appendChild(doExport);
+					}
+				}
+				for (var entKey in algorithmEntrypoints) {
+					var entVal = algorithmEntrypoints[entKey];
+					var inputs_types = [];
+					var inputs_argnames = [];
+					for (var ik in entVal["inputs"]) {
+						inputs_types.push(entVal["inputs"][ik]);
+						inputs_argnames.push(ik);
+					}
+					if (inputs_types.length == 1 && inputs_types[0] == objVal["type"]) {
+						console.log("siii");
+						var algorithm = document.createElement("span");
+						algorithm.innerHTML = "<a href=\"javascript:rpcCall('"+entKey+"',{'"+inputs_argnames[0]+"': '"+objKey+"'})\">"+entVal['name']+"</a>";
+						objDiv.appendChild(algorithm);
 					}
 				}
 				objectsContainer.appendChild(objDiv);
@@ -83,7 +98,7 @@
 				baseUrl += "&" + arg_key + "=" + arg_value;
 			}
 			jQuery.get(baseUrl, function(data) {
-				window.reload();
+				document.location.reload();
 			});
 		}
 	</script>

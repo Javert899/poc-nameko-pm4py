@@ -43,7 +43,8 @@ class ServiceRegister(Thread):
     def run(self):
         while True:
             self.registry.set("inductive_miner.apply_inductive", json.dumps(
-                {"inputs": {"log_key": "EventLog"}, "outputs": {"model_key": "AcceptingPetriNet"},
+                {"name": "Discover an Accepting Petri Net using the Inductive Miner", "inputs": {"log_key": "EventLog"},
+                 "outputs": {"model_key": "AcceptingPetriNet"},
                  "type": "algorithm"}))
             self.registry.expire("inductive_miner.apply_inductive", 20)
             time.sleep(10)

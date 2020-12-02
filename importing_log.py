@@ -1,8 +1,8 @@
 import json
+import tempfile
 import time
 import uuid
 from threading import Thread
-import tempfile
 
 import pm4py
 import redis
@@ -66,21 +66,27 @@ class ServiceRegister(Thread):
     def run(self):
         while True:
             self.registry.set("import_log.import_log",
-                              json.dumps({"inputs": {"path": "str"}, "outputs": {"target_key": "EventLog"},
+                              json.dumps({"name": "Import an event log given a path", "inputs": {"path": "str"},
+                                          "outputs": {"target_key": "EventLog"},
                                           "type": "algorithm"}))
             self.registry.expire("import_log.import_log", 20)
             self.registry.set("import_log.get_log_string",
-                              json.dumps({"inputs": {"log_key": "EventLog"}, "outputs": {"log_content": "str"},
-                                          "type": "algorithm"}))
+                              json.dumps(
+                                  {"name": "(Dummy) retrieve the content of the log", "inputs": {"log_key": "EventLog"},
+                                   "outputs": {"log_content": "str"},
+                                   "type": "dummy"}))
             self.registry.expire("import_log.get_log_string", 20)
             self.registry.set("import_log.eventlog_xes_uploading",
-                              json.dumps({"type": "importer", "extension": ".xes", "object_type": "EventLog"}))
+                              json.dumps({"name": "Upload an event log from a XES file",
+                                          "type": "importer", "extension": ".xes", "object_type": "EventLog"}))
             self.registry.expire("import_log.eventlog_xes_uploading", 20)
             self.registry.set("import_log.eventlog_xes_downloading",
-                              json.dumps({"type": "exporter", "extension": ".xes", "object_type": "EventLog"}))
+                              json.dumps({"name": "Download an event log into a XES file",
+                                          "type": "exporter", "extension": ".xes", "object_type": "EventLog"}))
             self.registry.expire("import_log.eventlog_xes_downloading", 20)
             self.registry.set("import_log.eventlog_csv_downloading",
-                              json.dumps({"type": "exporter", "extension": ".csv", "object_type": "EventLog"}))
+                              json.dumps({"name": "Download an event log into a CSV file", "type": "exporter",
+                                          "extension": ".csv", "object_type": "EventLog"}))
             self.registry.expire("import_log.eventlog_csv_downloading", 20)
             time.sleep(10)
 

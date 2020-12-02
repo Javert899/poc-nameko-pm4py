@@ -35,17 +35,9 @@ class ServiceRegister(Thread):
     def run(self):
         while True:
             self.registry.set("petri_net_svg_viewer.petri_net_svg", json.dumps(
-                {"inputs": {"model_key": "AcceptingPetriNet"}, "outputs": {"model_image": "SVG"},
-                 "type": "algorithm"}))
+                {"name": "Visualize the Accepting Petri Net", "input": "AcceptingPetriNet", "output": ".svg",
+                 "type": "visualizer"}))
             self.registry.expire("petri_net_svg_viewer.petri_net_svg", 20)
-            self.registry.set("petri_net_svg_viewer.enable_pnml_uploading",
-                              json.dumps(
-                                  {"type": "importer", "extension": ".pnml", "object_type": "AcceptingPetriNet"}))
-            self.registry.expire("petri_net_svg_viewer.enable_pnml_uploading", 20)
-            self.registry.set("petri_net_svg_viewer.enable_pnml_downloading",
-                              json.dumps(
-                                  {"type": "exporter", "extension": ".pnml", "object_type": "AcceptingPetriNet"}))
-            self.registry.expire("petri_net_svg_viewer.enable_pnml_downloading", 20)
             time.sleep(10)
 
 
