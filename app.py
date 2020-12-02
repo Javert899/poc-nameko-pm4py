@@ -67,7 +67,7 @@ def download():
     original_id= request.args.get("id", type=str)
     filename = request.args.get("filename", type=str)
     method = request.args.get("method", type=str)
-    eval("id = rpc." + method + "(" + original_id + ")")
+    id = eval("rpc." + method + "(\"" + original_id + "\")")
     print(original_id, id)
     content = database[id]
     temp_file = NamedTemporaryFile(suffix=".temp")

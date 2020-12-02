@@ -27,12 +27,15 @@ class ImportingLog(object):
         database.set(target_key + "_name", "Event Log")
         return target_key
 
+    @rpc
     def eventlog_xes_downloading(self, obj_id):
         return obj_id
 
+    @rpc
     def eventlog_xes_uploading(self, obj_id):
         return obj_id
 
+    @rpc
     def eventlog_csv_downloading(self, obj_id):
         log = database.get(obj_id).decode("utf-8")
         temp_xes = tempfile.NamedTemporaryFile(suffix=".xes")
@@ -46,7 +49,7 @@ class ImportingLog(object):
         temp_csv.close()
         dataframe.to_csv(temp_csv.name, index=False)
         csv_id = str(uuid.uuid4())
-        database.set(csv_id, open(temp_csv.name, "rb"))
+        database.set(csv_id, open(temp_csv.name, "rb").read())
         return csv_id
 
     @rpc
