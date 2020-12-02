@@ -2,8 +2,7 @@ import redis
 import uuid
 import pathlib
 from flask import Flask
-from flask import request, jsonify
-from type_mapping import type_mapping
+from flask import request, jsonify, send_file
 from flask_nameko import FlaskPooledClusterRpcProxy
 from tempfile import NamedTemporaryFile
 from poc_config import *
@@ -25,23 +24,6 @@ def call_service():
         else:
             kwargs[arg] = val
     return eval("rpc." + service + "(**kwargs)")
-
-
-def __get_object_types():
-    keys = [k.decode("utf-8") for k in list(database.keys())]
-    types = {}
-    for k in keys:
-        if "_type" in k:
-            types[k.split("_type")[0]] = database[k].decode("utf-8")
-    return types
-
-
-def __get_entrypoints():
-    keys = [k.decode("utf-8") for k in list(registry.keys())]
-    ep = {}
-    for k in keys:
-        ep[k] = registry[k].decode("utf-8")
-    return ep
 
 
 @app.route('/get_objects')
@@ -69,14 +51,53 @@ def upload():
     ret = []
     for filek in request.files:
         file = request.files[filek]
-        extension = pathlib.Path(file.filename).suffix
-        if extension in type_mapping:
-            object_type = type_mapping[extension]
-            object_id = str(uuid.uuid4())
-            content = file.stream.read()
-            database.set(object_id, content)
-            database.set(object_id+"_type", object_type)
+        object_id = str(uuid.uuid4())
+        content = file.stream.read()
+        database.set(object_id, content)
+        database.set(object_id + "_type", "")
+        ret.append(object_id)
     return jsonify(ret)
+
+
+@app.route("/set_objects_type", methods=['POST'])
+def set_objects_type():
+    content = request.json
+    for object_id in content:
+        database.set(object_id + "_type", content[object_id])
+    return ""
+
+
+@app.route('/download', methods=['GET'])
+def download():
+    id = request.args.get("id", type=str)
+    filename = request.args.get("filename", type=str)
+    content = database[id]
+    temp_file = NamedTemporaryFile(suffix=".temp")
+    temp_file.close()
+    file_name = temp_file.name
+    temp_file = open(file_name, "wb")
+    temp_file.write(content)
+    temp_file.close()
+    temp_file = open(file_name, "rb")
+    resp = send_file(temp_file, attachment_filename=filename)
+    return resp
+
+
+def __get_object_types():
+    keys = [k.decode("utf-8") for k in list(database.keys())]
+    types = {}
+    for k in keys:
+        if "_type" in k:
+            types[k.split("_type")[0]] = database[k].decode("utf-8")
+    return types
+
+
+def __get_entrypoints():
+    keys = [k.decode("utf-8") for k in list(registry.keys())]
+    ep = {}
+    for k in keys:
+        ep[k] = registry[k].decode("utf-8")
+    return ep
 
 
 if __name__ == "__main__":
