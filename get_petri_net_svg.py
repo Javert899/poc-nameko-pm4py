@@ -16,8 +16,8 @@ class PetriNetSvgViewer(object):
     name = "petri_net_svg_viewer"
 
     @rpc
-    def petri_net_svg(self, model_key):
-        petri_string = database.get(model_key).decode("utf-8")
+    def petri_net_svg(self, id):
+        petri_string = database.get(id).decode("utf-8")
         net, im, fm = pm4py.objects.petri.importer.variants.pnml.import_petri_from_string(petri_string)
         gviz = pm4py.visualization.petrinet.visualizer.apply(net, im, fm, parameters={"format": "svg"})
         render = gviz.render(cleanup=True)

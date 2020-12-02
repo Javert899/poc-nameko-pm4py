@@ -11,6 +11,7 @@
 		var objects = {};
 		var entrypoints = {};
 		var algorithmEntrypoints = {};
+		var availableVisualizers = {};
 		var availableImporters = {};
 		var availableExporters = {};
 		getObjects();
@@ -45,6 +46,12 @@
 					}
 					availableExporters[ent_value["object_type"]].push({"extension": ent_value["extension"], "method": ent_name, "name": ent_value["name"]});
 				}
+				else if (ent_value["type"] == "visualizer") {
+					if (!(ent_value["input"] in availableVisualizers)) {
+						availableVisualizers[ent_value["input"]] = [];
+					}
+					availableVisualizers[ent_value["input"]].push({"method": ent_name, "name": ent_value["name"]});
+				}
 			}
 		}
 		
@@ -62,14 +69,20 @@
 				var objType = document.createElement("div");
 				objType.innerHTML = "Object type: "+objVal["type"];
 				objDiv.appendChild(objType);
-				console.log(availableExporters);
-				console.log(objVal["type"]);
-				console.log(objVal["type"] in availableExporters);
 				if (objVal["type"] in availableExporters) {
 					for (var i in availableExporters[objVal["type"]]) {
+						var this_item = availableExporters[objVal["type"]][i];
 						var doExport = document.createElement("span");
-						doExport.innerHTML = "<b><a href='http://localhost:5000/download?id="+objKey+"&filename=prova"+availableExporters[objVal["type"]][i]["extension"]+"&method="+availableExporters[objVal["type"]][i]["method"]+"'>"+availableExporters[objVal["type"]][i]["name"]+"</a></b><br />";
+						doExport.innerHTML = "<b><a href='http://localhost:5000/download?id="+objKey+"&filename=prova"+this_item["extension"]+"&method="+this_item["method"]+"'>"+this_item["name"]+"</a></b><br />";
 						objDiv.appendChild(doExport);
+					}
+				}
+				if (objVal["type"] in availableVisualizers) {
+					for (var i in availableVisualizers[objVal["type"]]) {
+						var this_item = availableVisualizers[objVal["type"]][i];
+						var doVisualization = document.createElement("span");
+						doVisualization.innerHTML = "<a href=\"http://localhost:5000/call_service?service="+this_item['method']+"&id="+objKey+"\" target=\"_blank\">"+this_item['name']+"</a>";
+						objDiv.appendChild(doVisualization);
 					}
 				}
 				for (var entKey in algorithmEntrypoints) {
@@ -81,12 +94,14 @@
 						inputs_argnames.push(ik);
 					}
 					if (inputs_types.length == 1 && inputs_types[0] == objVal["type"]) {
-						console.log("siii");
 						var algorithm = document.createElement("span");
 						algorithm.innerHTML = "<a href=\"javascript:rpcCall('"+entKey+"',{'"+inputs_argnames[0]+"': '"+objKey+"'})\">"+entVal['name']+"</a>";
 						objDiv.appendChild(algorithm);
 					}
 				}
+				var emptySpan = document.createElement("span");
+				emptySpan.innerHTML = "<br /><br />";
+				objDiv.appendChild(emptySpan);
 				objectsContainer.appendChild(objDiv);
 			}
 		}
