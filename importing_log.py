@@ -23,6 +23,7 @@ class ImportingLog(object):
         target_key = str(uuid.uuid4())
         database.set(target_key, log)
         database.set(target_key + "_type", "EventLog")
+        database.set(target_key + "_name", "Event Log")
         return target_key
 
     @rpc

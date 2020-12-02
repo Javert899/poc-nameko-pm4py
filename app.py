@@ -30,22 +30,22 @@ def call_service():
 
 @app.route('/get_objects')
 def get_objects():
-    types = __get_object_types()
-    stru = ["<ul>"]
+    types, names = __get_object_types_and_names()
+    ret = {}
     for o, t in types.items():
-        stru.append("<li>%s %s</li>" % (o, t))
-    stru.append("</ul>")
-    return "".join(stru)
+        ret[o] = {"type": t, "name": ""}
+    for o, n in names.items():
+        ret[o]["name"] = n
+    return ret
 
 
 @app.route('/get_entrypoints')
 def get_entrypoints():
     entrypoints = __get_entrypoints()
-    stru = ["<ul>"]
+    ret = {}
     for e, t in entrypoints.items():
-        stru.append("<li>%s %s</li>" % (e, t))
-    stru.append("</ul>")
-    return "".join(stru)
+        ret[e] = t
+    return ret
 
 
 @app.route("/upload", methods=['POST'])
@@ -57,6 +57,7 @@ def upload():
         content = file.stream.read()
         database.set(object_id, content)
         database.set(object_id + "_type", "")
+        database.set(object_id + "_name", object_id)
         ret.append(object_id)
     return jsonify(ret)
 
@@ -85,13 +86,24 @@ def set_objects_type():
     return ""
 
 
-def __get_object_types():
+@app.route("/set_objects_name", methods=['POST'])
+def set_objects_name():
+    content = request.json
+    for object_id in content:
+        database.set(object_id + "_name", content[object_id])
+    return ""
+
+
+def __get_object_types_and_names():
     keys = [k.decode("utf-8") for k in list(database.keys())]
     types = {}
+    names = {}
     for k in keys:
         if "_type" in k:
             types[k.split("_type")[0]] = database[k].decode("utf-8")
-    return types
+        if "_name" in k:
+            names[k.split("_name")[0]] = database[k].decode("utf-8")
+    return types, names
 
 
 def __get_entrypoints():

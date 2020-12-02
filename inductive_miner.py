@@ -31,6 +31,7 @@ class InductiveMiner(object):
         model_key = str(uuid.uuid4())
         database.set(model_key, net_string)
         database.set(model_key + "_type", "AcceptingPetriNet")
+        database.set(model_key + "_name", "Petri Net Discovered by Inductive Miner")
         return model_key
 
 
